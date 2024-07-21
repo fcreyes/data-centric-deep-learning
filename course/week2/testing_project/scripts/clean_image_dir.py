@@ -119,7 +119,7 @@ if __name__ == "__main__":
 
   out_dir.mkdir(parents=True, exist_ok=True)
 
-  raw_paths = raw_dir.glob('*.png')
+  raw_paths = raw_dir.glob('*.JPG')
 
   for raw_path in raw_paths:
     clean_photo_image(str(raw_path), str(out_dir))
