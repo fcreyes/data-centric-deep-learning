@@ -225,14 +225,8 @@ class TrainIdentifyReview(FlowSpec):
     # Types
     # --
     # ranked_label_issues: List[int]
-    dm = ReviewDataModule(self.config)
-    y = np.concatenate([
-      np.asarray(dm.train_dataset.data.label),
-      np.asarray(dm.dev_dataset.data.label),
-      np.asarray(dm.test_dataset.data.label),
-    ])
     ranked_label_issues = find_label_issues(
-      y,
+      self.all_df.label,
       prob,
       return_indices_ranked_by="self_confidence",
     )
@@ -332,7 +326,6 @@ class TrainIdentifyReview(FlowSpec):
     # dm.train_dataset.data = training slice of self.all_df
     # dm.dev_dataset.data = dev slice of self.all_df
     # dm.test_dataset.data = test slice of self.all_df
-    self.all_df = self.all_df[self.og_all_df_columns]
     dm.train_dataset.data = self.all_df.iloc[:train_size]
     dm.dev_dataset.data = self.all_df.iloc[train_size:train_size+dev_size]
     dm.test_dataset.data = self.all_df.iloc[train_size+dev_size:]
