@@ -56,6 +56,9 @@ class TrainFlow(FlowSpec):
         # data point maintains the same label.
         # TODO
         # ================================
+        transforms.RandomRotation(20),
+        transforms.ColorJitter(),
+        transforms.RandomAffine(5),
         transforms.ToTensor(),
       ])
     else:

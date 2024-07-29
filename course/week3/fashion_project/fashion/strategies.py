@@ -13,7 +13,9 @@ def random_sampling(pred_probs: torch.Tensor, budget : int = 1000) -> List[int]:
   '''
   fix_random_seed(42)
   
-  indices = []
+  indices = np.arange(pred_probs.shape[0])
+  np.random.shuffle(indices)
+  indices = (indices[:min(pred_probs.shape[0], budget)]).tolist()
   # ================================
   # FILL ME OUT
   # Randomly pick a 1000 examples to label. This serves as a baseline.
@@ -29,8 +31,10 @@ def uncertainty_sampling(pred_probs: torch.Tensor, budget : int = 1000) -> List[
   :param budget: the number of examples you are allowed to pick for labeling.
   :return indices: A list of indices (into the `pred_probs`) for examples to label.
   '''
-  indices = []
-  chance_prob = 1 / 10.  # may be useful
+  assert len(pred_probs.shape) == 2
+  max_pred_probs, _ = pred_probs.max(axis=1)
+  _, indices = torch.sort(max_pred_probs, descending=False)
+  indices = indices[:min(pred_probs.shape[0], budget)].numpy().tolist()
   # ================================
   # FILL ME OUT
   # Sort indices by the predicted probabilities and choose the 1000 examples with 
@@ -47,7 +51,10 @@ def margin_sampling(pred_probs: torch.Tensor, budget : int = 1000) -> List[int]:
   :param budget: the number of examples you are allowed to pick for labeling.
   :return indices: A list of indices (into the `pred_probs`) for examples to label.
   '''
-  indices = []
+  topk_vals, _ = pred_probs.topk(2, dim=1)
+  diffs = torch.abs(topk_vals[0] - topk_vals[1])
+  _, indices = torch.sort(diffs, descending=False)
+  indices = indices[:min(pred_probs.shape[0], budget)].numpy().tolist()
   # ================================
   # FILL ME OUT
   # Sort indices by the different in predicted probabilities in the top two classes per example.
@@ -61,8 +68,14 @@ def entropy_sampling(pred_probs: torch.Tensor, budget : int = 1000) -> List[int]
   :param budget: the number of examples you are allowed to pick for labeling.
   :return indices: A list of indices (into the `pred_probs`) for examples to label.
   '''
-  indices = []
+  classes = pred_probs.shape[1]
   epsilon = 1e-6
+  entropy = -torch.sum(
+    pred_probs * torch.log(pred_probs + epsilon) / np.log(classes),  
+    axis=1,
+  )
+  _, indices = torch.sort(entropy)
+  indices = indices[:min(pred_probs.shape[0], budget)].numpy().tolist()
   # ================================
   # FILL ME OUT
   # Entropy is defined as -E_classes[log p(class | input)] aja the expected log probability
