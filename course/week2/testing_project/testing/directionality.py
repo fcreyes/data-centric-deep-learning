@@ -70,7 +70,7 @@ class MNISTDirectionalityTest(BaseTest):
     paths (list[str]): list of image paths belonging to integration
       examples.
     """
-    paths = glob(join(test_dir, 'digits-processed', '*.png'))
+    paths = glob(join(test_dir, 'digits-processed', '*.JPG'))
     return paths
 
   def create_directionality_tuples(self, paths):
@@ -166,7 +166,10 @@ class MNISTDirectionalityTest(BaseTest):
       # --
       # batch_metric: float (not torch.Tensor!)
       #   Metric computed on a minibatch
-      pass  # remove me
+      batch_metric = (
+        torch.eq(preds_raw, preds_transformed).sum() /
+        preds_raw.shape[0]
+      ).item()
       # ================================
       metric.append(batch_metric)
       pbar.update()

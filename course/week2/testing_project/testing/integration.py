@@ -8,6 +8,7 @@ import pandas as pd
 from glob import glob
 from os.path import join
 from PIL import Image
+from pytorch_lightning import Trainer
 from torchvision import transforms
 from torch.utils.data import Dataset, DataLoader
 
@@ -33,7 +34,7 @@ class MNISTIntegrationTest(BaseTest):
     # corresponding labels for each path in `paths`.
     labels_df = pd.read_csv(join(test_dir, 'labels.csv'))
     labels_dict = dict(zip(labels_df.path, labels_df.label))
-    paths = glob(join(test_dir, 'digits-processed', '*.png'))
+    paths = glob(join(test_dir, 'digits-processed', '*.JPG'))
     for path in paths:
       name = os.path.basename(path)
       label = labels_dict[name]
@@ -49,7 +50,7 @@ class MNISTIntegrationTest(BaseTest):
     loader = DataLoader(dataset, batch_size=batch_size)
     return loader
 
-  def test(self, trainer, system):
+  def test(self, trainer: Trainer, system):
     # ================================
     # FILL ME OUT
     #
@@ -64,8 +65,10 @@ class MNISTIntegrationTest(BaseTest):
     # Notes:
     # --
     # Nothing to return here
-    pass  # remove me
+    # pass  # remove me
     # ================================
+    loader = self.get_dataloader()
+    trainer.test(system, loader)
 
 
 class MNISTIntegrationDataset(Dataset):

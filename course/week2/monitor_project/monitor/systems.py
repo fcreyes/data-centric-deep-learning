@@ -59,18 +59,18 @@ class SentimentClassifierSystem(pl.LightningModule):
   config (dotmap.DotMap): a configuration file with hyperparameters.
     See config.py for an example.
   """
-  def __init__(self, config):
+  def __init__(self, config, use_existing_model=False):
     super().__init__()
     self.save_hyperparameters()
     self.config = config
 
     # load model
-    self.model = self.get_model()
+    self.model = self.get_model(use_existing_model)
 
     # We will overwrite this once we run `test()`
     self.test_results = {}
 
-  def get_model(self):
+  def get_model(self, use_existing_model):
     model = nn.Sequential(
       nn.Linear(768, self.config.model.width),
       nn.ReLU(),
